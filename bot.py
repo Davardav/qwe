@@ -10,13 +10,15 @@ def handle_start(message):
 
 @bot.message_handler(commands=['help'])
 def handle_help(message):
-    bot.send_message(message.chat.id, "Доступные команды: /show_city [город], /remember_city [город], /show_my_cities")
+    bot.send_message(message.chat.id, "Доступные команды: /show_city [город][цвет], /remember_city [город], /show_my_cities[цвет]")
 
 @bot.message_handler(commands=['show_city'])
 def handle_show_city(message):
-    city_name = message.text.split()[-1]
+    city_name = message.text.split()[-2]
+    color = message.text.split()[-1]
+
     user_id = message.chat.id
-    manager.create_grapf(f'{user_id}.png',[city_name])
+    manager.create_grapf(f'{user_id}.png',[city_name],color)
     with open(f'{user_id}.png','rb') as map:
         bot.send_photo(user_id, map)
 
@@ -31,10 +33,11 @@ def handle_remember_city(message):
 
 @bot.message_handler(commands=['show_my_cities'])
 def handle_show_visited_cities(message):
+    color = message.text.split()[-1]
     cities = manager.select_cities(message.chat.id)
     # Реализуй отрисовку всех городов
     if cities:
-        manager.create_grapf(f'{message.chat.id}_cities.png',cities)
+        manager.create_grapf(f'{message.chat.id}_cities.png',cities,color)
         with open(f'{message.chat.id}_cities.png','rb') as map:
             bot.send_photo(message.chat.id, map)
     else:
